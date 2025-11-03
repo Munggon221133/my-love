@@ -34,7 +34,7 @@ export default function Gallery() {
     const [progress, setProgress] = useState(0);
 
     // romantic elements
-    const [hearts, setHearts] = useState<Array<{ id: number, x: number, y: number }>>([]);
+    const [hearts] = useState<Array<{ id: number, x: number, y: number }>>([]);
     const [sparkles, setSparkles] = useState<Array<{ id: number, x: number, y: number }>>([]);
 
     // confetti
@@ -50,21 +50,6 @@ export default function Gallery() {
         "#c8a2ff", "#a8e6cf", "#ffd3b6", "#ffaaa5", "#d8bfd8"
     ];
 
-    // generate floating hearts
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (hearts.length < 8) {
-                setHearts(prev => [...prev, {
-                    id: Date.now() + Math.random(),
-                    x: Math.random() * 100,
-                    y: 110
-                }].slice(-12));
-            }
-        }, 2000);
-
-        return () => clearInterval(interval);
-    }, [hearts.length]);
-
     // generate sparkles
     useEffect(() => {
         const interval = setInterval(() => {
@@ -76,20 +61,6 @@ export default function Gallery() {
         }, 800);
 
         return () => clearInterval(interval);
-    }, []);
-
-    // animate hearts
-    useEffect(() => {
-        const animateHearts = () => {
-            setHearts(prev => prev.map(heart => ({
-                ...heart,
-                y: heart.y - 0.3,
-                x: heart.x + Math.sin(heart.y * 0.1) * 0.1
-            })).filter(heart => heart.y > -10));
-        };
-
-        const heartInterval = setInterval(animateHearts, 50);
-        return () => clearInterval(heartInterval);
     }, []);
 
     // enhanced confetti burst with more colors and shapes
