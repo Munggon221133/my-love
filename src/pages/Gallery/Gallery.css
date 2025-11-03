@@ -1,5 +1,4 @@
 :root {
-    --bg: #07080d;
     --ink: #f5f7fb;
     --muted: #b7c1d4;
     --ring: rgba(99, 153, 255, .35);
@@ -37,6 +36,7 @@ body {
 
 .credits-page {
     position: relative;
+    background-color: #07080d;
     min-height: 100vh;
     display: grid;
     grid-template-rows: auto 1fr auto;
