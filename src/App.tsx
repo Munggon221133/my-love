@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import type { FormEvent } from "react";
+import taroLogo from "./assets/taro.jpg";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [value, setValue] = useState("");
+  const [result, setResult] = useState<"success" | "error" | null>(null);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const cleaned = value.trim().toLowerCase();
+
+    if (!cleaned) return;
+
+    if (cleaned === "taro") {
+      setResult("success");
+    } else {
+      setResult("error");
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="container">
+      <img src={taroLogo} className="taro" alt="Taro cat" />
+
+      <form onSubmit={handleSubmit} className="input-row">
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setResult(null);
+          }}
+          placeholder="Write the cat name (ENG)"
+          className="text-input"
+        />
+        <button type="submit" className="hidden-submit" />
+      </form>
+
+      {result === "success" && (
+        <div className="alert success">
+          ✅ Correct! TARO detected 🐾
+        </div>
+      )}
+
+      {result === "error" && (
+        <div className="alert error">
+          ❌ Wrong — try again 😼
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
