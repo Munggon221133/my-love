@@ -39,7 +39,7 @@ function App() {
 
       {result === "success" && (
         <div className="alert success">
-          ✅ Correct! TARO detected 🐾
+          ✅ Correct! 🐾
         </div>
       )}
 
