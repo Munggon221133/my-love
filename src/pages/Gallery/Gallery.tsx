@@ -484,7 +484,7 @@ export default function Gallery() {
                         />
                     </div>
 
-                    <div className="choices-prompt">คืนดีกันน้าาาาาา 💗 กดได้เร็ว</div>
+                    <div className="choices-prompt">คืนดีกันน้าาาาาา 💗 กดปุ่ม "ได้" เร็ว</div>
                     <div className="choices glass" role="group" aria-label="Answer choices">
                         <button
                             className="choice-btn yes"
