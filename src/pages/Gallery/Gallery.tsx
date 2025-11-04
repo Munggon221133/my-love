@@ -127,6 +127,11 @@ function SwipeDeck({
                     {/* Show video when deck is empty */}
                     {videoSrc && (
                         <>
+                            {!soundEnabled && (
+                                <button className="sound-btn" onClick={enableSound}>
+                                    เปิดเสียง 💗
+                                </button>
+                            )}
                             <video
                                 ref={videoRef}
                                 src={videoSrc}
@@ -136,11 +141,6 @@ function SwipeDeck({
                                 playsInline
                                 className="ending-video"
                             />
-                            {!soundEnabled && (
-                                <button className="sound-btn" onClick={enableSound}>
-                                    เปิดเสียง 💗
-                                </button>
-                            )}
                         </>
                     )}
                 </div>
