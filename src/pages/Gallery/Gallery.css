@@ -47,7 +47,7 @@
 
 .line {
     margin: 18px 0;
-    color: #e9e9ee;
+    color: #583101;
 }
 
 /* Choices */
@@ -55,13 +55,12 @@
     position: sticky;
     bottom: 0;
     z-index: 4;
-    background: linear-gradient(180deg, rgba(14, 14, 16, 0), rgba(14, 14, 16, 0.85) 35%, rgba(14, 14, 16, 1));
     backdrop-filter: blur(8px);
 }
 
 .choices-prompt {
     text-align: center;
-    color: #d2a49e;
+    color: #583101;
     font-size: clamp(14px, 3vw, 16px);
     margin: 8px 0 6px;
 }
