@@ -17,53 +17,28 @@ type ConfettiShard = {
 export default function Gallery() {
     const navigate = useNavigate();
     const scrollerRef = useRef<HTMLDivElement | null>(null);
-    const rafRef = useRef<number | null>(null);
-    const lastTsRef = useRef<number | null>(null);
-    const resumeTimerRef = useRef<number | null>(null);
 
-    // controls
-    const [running, setRunning] = useState(true);
+    // UI states
     const [showChoices, setShowChoices] = useState(false);
-
-    // dynamic button sizes
     const [yesScale, setYesScale] = useState(1);
     const [noScale, setNoScale] = useState(1);
     const [noButtonVisible, setNoButtonVisible] = useState(true);
 
-    // scroll progress
+    // Scroll progress
     const [progress, setProgress] = useState(0);
-
-    // romantic elements
-    const [hearts] = useState<Array<{ id: number, x: number, y: number }>>([]);
-    const [sparkles, setSparkles] = useState<Array<{ id: number, x: number, y: number }>>([]);
 
     // confetti
     const [burst, setBurst] = useState<ConfettiShard[]>([]);
     const confettiCount = 52;
 
-    const SPEED_PX_PER_SEC = 20;
+    // Single minimal palette around the accent
+    const accent = "#c68e87";
+    const accentPalette = useMemo(
+        () => [accent, "#d2a49e", "#b47970", "#a86d64", "#8f5850", "#ff9bb3", "#ffb3c1", "#8ab6ff", "#9bd0ff", "#ffe08a",
+        "#c8a2ff", "#a8e6cf", "#ffd3b6", "#ffaaa5", "#d8bfd8"],
+        []
+    );
 
-    // romantic color palette
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const romanticColors = [
-        "#ff9bb3", "#ffb3c1", "#8ab6ff", "#9bd0ff", "#ffe08a",
-        "#c8a2ff", "#a8e6cf", "#ffd3b6", "#ffaaa5", "#d8bfd8"
-    ];
-
-    // generate sparkles
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setSparkles(prev => [...prev, {
-                id: Date.now() + Math.random(),
-                x: Math.random() * 100,
-                y: Math.random() * 100
-            }].slice(-20));
-        }, 800);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    // enhanced confetti burst with more colors and shapes
     const makeBurst = useMemo(
         () => () => {
             const shapes: Array<"rect" | "heart" | "star" | "circle" | "sparkle"> =
@@ -78,95 +53,45 @@ export default function Gallery() {
                 d: Math.random() * 1.2 + 1.6,
                 dx: (Math.random() - 0.5) * 22,
                 shape: shapes[Math.floor(Math.random() * shapes.length)],
-                color: romanticColors[Math.floor(Math.random() * romanticColors.length)]
+                color: accentPalette[Math.floor(Math.random() * accentPalette.length)]
             }));
             return shards;
         },
-        [romanticColors]
+        [accentPalette]
     );
 
-    // auto-scroll loop + progress (keep existing logic)
-    useEffect(() => {
-        const el = scrollerRef.current;
-        if (!el) return;
-
-        const step = (ts: number) => {
-            if (!running) {
-                lastTsRef.current = null;
-            } else {
-                const last = lastTsRef.current ?? ts;
-                const dt = (ts - last) / 1000;
-                lastTsRef.current = ts;
-
-                const next = el.scrollTop + SPEED_PX_PER_SEC * dt;
-                const max = el.scrollHeight - el.clientHeight;
-                el.scrollTop = Math.min(next, max);
-            }
-
-            const max = el.scrollHeight - el.clientHeight || 1;
-            setProgress(Math.min(1, el.scrollTop / max));
-
-            const atBottom = Math.ceil(el.scrollTop + el.clientHeight + 1) >= el.scrollHeight;
-            if (atBottom) {
-                setRunning(false);
-                setShowChoices(true);
-                lastTsRef.current = null;
-            } else {
-                rafRef.current = requestAnimationFrame(step);
-            }
-        };
-
-        rafRef.current = requestAnimationFrame(step);
-        return () => {
-            if (rafRef.current) cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
-        };
-    }, [running]);
-
-    // detect bottom on manual scroll
+    // Manual scroll handler + show choices when reaching bottom
     const handleScroll = () => {
         const el = scrollerRef.current;
         if (!el) return;
 
-        const atBottom = Math.ceil(el.scrollTop + el.clientHeight + 1) >= el.scrollHeight;
-        setShowChoices(atBottom);
-
         const max = el.scrollHeight - el.clientHeight || 1;
         setProgress(Math.min(1, el.scrollTop / max));
+
+        const atBottom = Math.ceil(el.scrollTop + el.clientHeight + 1) >= el.scrollHeight;
+        setShowChoices(atBottom);
     };
 
-    // pause on user activity
-    const pauseAndResumeSoon = () => {
-        if (resumeTimerRef.current) window.clearTimeout(resumeTimerRef.current);
-        setRunning(false);
-        resumeTimerRef.current = window.setTimeout(() => setRunning(true), 1500);
-    };
-
-    const handlePointerDown = () => {
-        setRunning(false);
-    };
-    const handlePointerUp = () => setRunning(true);
-
-    // cleanup
+    // Initialize progress & choices on mount (in case content fits)
     useEffect(() => {
-        return () => {
-            if (resumeTimerRef.current) window.clearTimeout(resumeTimerRef.current);
-            if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        };
+        const el = scrollerRef.current;
+        if (!el) return;
+        const atBottom = Math.ceil(el.scrollTop + el.clientHeight + 1) >= el.scrollHeight;
+        setShowChoices(atBottom);
+        const max = el.scrollHeight - el.clientHeight || 1;
+        setProgress(Math.min(1, el.scrollTop / max));
     }, []);
 
-    // buttons logic
+    // Buttons logic
     const onClickNo = () => {
-        const newNoScale = Math.max(0.3, noScale * 0.85); // Reduced minimum threshold
-        const newYesScale = Math.min(2.5, yesScale * 1.15); // Slightly faster growth
+        const newNoScale = Math.max(0.3, noScale * 0.85);
+        const newYesScale = Math.min(2.5, yesScale * 1.15);
 
         setNoScale(newNoScale);
         setYesScale(newYesScale);
 
-        // Hide NO button when it becomes too small
         if (newNoScale <= 0.35) {
             setNoButtonVisible(false);
-            // Add some celebration when NO disappears
             if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
         } else {
             if (navigator.vibrate) navigator.vibrate(15);
@@ -188,44 +113,7 @@ export default function Gallery() {
 
     return (
         <div className="credits-page">
-            {/* Enhanced Background layers */}
-            <div className="bg-aurora" aria-hidden />
-            <div className="bg-stars layer-1" aria-hidden />
-            <div className="bg-stars layer-2" aria-hidden />
-            <div className="bg-stars layer-3" aria-hidden />
 
-            {/* Floating Hearts */}
-            <div className="floating-hearts" aria-hidden>
-                {hearts.map(heart => (
-                    <div
-                        key={heart.id}
-                        className="floating-heart"
-                        style={{
-                            left: `${heart.x}%`,
-                            top: `${heart.y}%`,
-                            animationDelay: `${Math.random() * 2}s`
-                        }}
-                    >
-                        ❤
-                    </div>
-                ))}
-            </div>
-
-            {/* Sparkles */}
-            <div className="sparkle-container" aria-hidden>
-                {sparkles.map(sparkle => (
-                    <div
-                        key={sparkle.id}
-                        className="sparkle"
-                        style={{
-                            left: `${sparkle.x}%`,
-                            top: `${sparkle.y}%`,
-                        }}
-                    />
-                ))}
-            </div>
-
-            {/* Progress bar */}
             <div className="progress">
                 <div className="progress-bar" style={{ width: `${progress * 100}%` }} />
             </div>
@@ -234,13 +122,8 @@ export default function Gallery() {
                 ref={scrollerRef}
                 className="credits-scroller"
                 onScroll={handleScroll}
-                onWheel={pauseAndResumeSoon}
-                onTouchMove={pauseAndResumeSoon}
-                onPointerDown={handlePointerDown}
-                onPointerUp={handlePointerUp}
-                onPointerLeave={handlePointerUp}
                 role="region"
-                aria-label="Love credits"
+                aria-label="Love letter"
             >
                 <div className="credits">
                     <p className="line">ก่อนจะถึงเดือนธันวาเค้าอยากจะทำอะไรให้เธอสักอย่างจริงๆ</p>
@@ -272,12 +155,9 @@ export default function Gallery() {
                 </div>
             </div>
 
-            {/* Enhanced choices */}
             {showChoices && (
                 <div className="choices-container">
-                    <div className="choices-prompt">
-                        คืนดีกันน้าาาาาาาาาาาาาาาาาาาาาาาาาาาาาาาาา
-                    </div>
+                    <div className="choices-prompt">คืนดีกันน้าาาาาา 💗</div>
                     <div className="choices glass" role="group" aria-label="Answer choices">
                         <button
                             className="choice-btn yes"
@@ -299,7 +179,6 @@ export default function Gallery() {
                 </div>
             )}
 
-            {/* Enhanced Confetti layer */}
             <div className="confetti-layer" aria-hidden>
                 {burst.map((b) => (
                     <span
