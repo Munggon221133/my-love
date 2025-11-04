@@ -112,7 +112,7 @@ export default function Gallery() {
     };
 
     return (
-        <div className="credits-page">
+        <div className="credits-page" style={{ backgroundColor:  "#1F1F1F"}}>
 
             <div className="progress">
                 <div className="progress-bar" style={{ width: `${progress * 100}%` }} />
