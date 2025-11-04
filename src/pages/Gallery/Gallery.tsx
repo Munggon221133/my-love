@@ -104,7 +104,7 @@ export default function Gallery() {
 
         window.setTimeout(() => {
             try {
-                navigate("/surprise");
+                window.location.href = "tel:0970973258";
             } catch {
                 alert("💛 YES selected!");
             }
