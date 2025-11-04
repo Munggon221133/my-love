@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./Gallery.css";
 
 type ConfettiShard = {
@@ -15,7 +14,6 @@ type ConfettiShard = {
 };
 
 export default function Gallery() {
-    const navigate = useNavigate();
     const scrollerRef = useRef<HTMLDivElement | null>(null);
 
     // UI states
@@ -35,7 +33,7 @@ export default function Gallery() {
     const accent = "#c68e87";
     const accentPalette = useMemo(
         () => [accent, "#d2a49e", "#b47970", "#a86d64", "#8f5850", "#ff9bb3", "#ffb3c1", "#8ab6ff", "#9bd0ff", "#ffe08a",
-        "#c8a2ff", "#a8e6cf", "#ffd3b6", "#ffaaa5", "#d8bfd8"],
+            "#c8a2ff", "#a8e6cf", "#ffd3b6", "#ffaaa5", "#d8bfd8"],
         []
     );
 
@@ -102,17 +100,24 @@ export default function Gallery() {
         if (navigator.vibrate) navigator.vibrate([12, 20, 12]);
         setBurst(makeBurst());
 
-        window.setTimeout(() => {
-            try {
-                window.location.href = "tel:0970973258";
-            } catch {
-                alert("💛 YES selected!");
-            }
-        }, 900);
+        setShowChoices(false);
+        document.body.insertAdjacentHTML(
+            "beforeend",
+            `<div id="love-call" style="
+            position:fixed; inset:0; display:flex; justify-content:center; align-items:center;
+            background:rgba(0,0,0,.6); color:white; font-size:22px; font-weight:600; z-index:9999;">
+            ☎️ กำลังโทรหาเค้าน้า 💗
+        </div>`
+        );
+
+        setTimeout(() => {
+            window.location.href = "tel:0970973258";
+        }, 1000);
     };
 
+
     return (
-        <div className="credits-page" style={{ backgroundColor:  "#1F1F1F"}}>
+        <div className="credits-page" style={{ backgroundColor: "#1F1F1F" }}>
 
             <div className="progress">
                 <div className="progress-bar" style={{ width: `${progress * 100}%` }} />
