@@ -6,7 +6,6 @@
     overflow: hidden;
 }
 
-/* Minimal progress */
 .progress {
     position: sticky;
     top: 0;
@@ -25,17 +24,15 @@
     transition: width .15s linear;
 }
 
-/* Scroll area (manual only) */
 .credits-scroller {
     position: relative;
     z-index: 1;
     height: 100vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 24px 16px 120px;
+    padding: 24px 16px 50px;
 }
 
-/* Content */
 .credits {
     max-width: 720px;
     margin: 0 auto;
@@ -47,23 +44,51 @@
 
 .line {
     margin: 18px 0;
-    color: #e9e9ee;
+    color: #583101;
 }
 
-/* Choices */
+.swipe-empty {
+  text-align: center;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.ending-video {
+  width: 100%;
+  max-width: 350px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.sound-btn {
+  margin-top: 8px;
+  padding: 10px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  background: #c68e87;
+  color: #fff;
+  cursor: pointer;
+}
+
+.sound-btn:hover { background: #a8726b; }
+
 .choices-container {
     position: sticky;
     bottom: 0;
     z-index: 4;
-    background: linear-gradient(180deg, rgba(14, 14, 16, 0), rgba(14, 14, 16, 0.85) 35%, rgba(14, 14, 16, 1));
     backdrop-filter: blur(8px);
 }
 
 .choices-prompt {
     text-align: center;
-    color: #d2a49e;
+    color: #583101;
     font-size: clamp(14px, 3vw, 16px);
-    margin: 8px 0 6px;
+    margin: 200px 0 6px;
 }
 
 .choices {
@@ -89,7 +114,6 @@
     background: transparent;
 }
 
-/* Filled accent for YES, outline for NO */
 .choice-btn.yes {
     background: #c68e87;
     border-color: transparent;
@@ -119,18 +143,15 @@
     transform: translateY(1px) scale(0.99);
 }
 
-/* Smooth gap adjustments */
 .choices {
     transition: gap .25s ease;
 }
 
-/* Slight fade when very small */
 .choice-btn.no[style*="scale(0.35)"] {
     opacity: 0.65;
     filter: blur(0.3px);
 }
 
-/* Confetti — minimal, accent only */
 .confetti-layer {
     pointer-events: none;
     position: fixed;
@@ -198,6 +219,149 @@
     }
 }
 
+.cards {
+    max-width: 760px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-top: 4vh;
+}
+
+.note-card {
+    --rot: calc((var(--i) % 2 - 0.5) * 2deg);
+    position: relative;
+    background: #fff4ea;
+    color: #583101;
+    border: 1px solid rgba(0, 0, 0, .06);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, .08),
+        0 1px 0 rgba(255, 255, 255, .4) inset;
+    transform: rotate(var(--rot)) translateY(6px);
+    opacity: 0;
+    translate: 0 16px;
+    transition: opacity .5s ease, translate .5s ease, transform .25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.note-card.visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.note-card:active,
+.note-card:hover {
+    transform: rotate(var(--rot)) translateY(0);
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, .12),
+        0 1px 0 rgba(255, 255, 255, .5) inset;
+}
+
+.note-pin {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #c68e87;
+    color: #fff;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.note-text {
+    margin: 0;
+    font-size: clamp(15px, 4vw, 19px);
+    line-height: 1.7;
+}
+
+.choices-container {
+    background: linear-gradient(180deg, rgba(221, 184, 146, 0), rgba(221, 184, 146, 0.65) 35%, rgba(221, 184, 146, 0.9));
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+/* --- Swipe deck layout --- */
+.swipe-wrap {
+    display: grid;
+    place-items: center;
+    margin: 12px auto 50px;
+    width: 100%;
+}
+
+.swipe-deck {
+    position: relative;
+    width: min(88vw, 340px);
+    height: calc(min(88vw, 340px) * 1.35);
+    max-width: 360px;
+    max-height: 520px;
+}
+
+.swipe-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    border-radius: 18px;
+    overflow: hidden;
+    background: #c68e87;
+    border: 1px solid #c68e87;
+}
+
+.swipe-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+.swipe-card.grabbing {
+    cursor: grabbing;
+}
+
+.swipe-back {
+    filter: brightness(0.85) blur(2px);
+}
+
+/* soft bottom gradient for text legibility (if you overlay text in future) */
+.swipe-gradient {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 28%;
+    background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent);
+    pointer-events: none;
+}
+
+.swipe-caption {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    padding: 6px 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: white;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.65);
+    pointer-events: none;
+    white-space: pre-line;
+}
+
+/* Optional: make the deck sit nicely with your glass UI */
+.choices-container .swipe-wrap+.choices-prompt {
+    margin-top: 200px;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .confetti {
@@ -208,7 +372,7 @@
 /* Responsive tweaks */
 @media (min-width: 640px) {
     .credits-scroller {
-        padding: 32px 24px 140px;
+        padding: 32px 24px 70px;
     }
 
     .choices {
