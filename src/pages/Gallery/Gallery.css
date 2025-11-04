@@ -49,10 +49,10 @@
 
 .swipe-empty {
   text-align: center;
-  padding: 16px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -359,7 +359,7 @@
 
 /* Optional: make the deck sit nicely with your glass UI */
 .choices-container .swipe-wrap+.choices-prompt {
-    margin-top: 250px;
+    margin-top: 300px;
 }
 
 /* Reduced motion */
