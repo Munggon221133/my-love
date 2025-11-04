@@ -1,5 +1,37 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./Gallery.css";
+import img01 from "../../assets/img01.jpg";
+import img02 from "../../assets/img02.jpg";
+import img03 from "../../assets/img03.jpg";
+import img04 from "../../assets/img04.jpg";
+import img05 from "../../assets/img05.jpg";
+import img06 from "../../assets/img06.jpg";
+import img07 from "../../assets/img07.jpg";
+import img08 from "../../assets/img08.jpg";
+import img09 from "../../assets/img09.jpg";
+import img10 from "../../assets/img10.jpg";
+
+import img11 from "../../assets/img11.jpg";
+import img12 from "../../assets/img12.jpg";
+import img13 from "../../assets/img13.jpg";
+import img14 from "../../assets/img14.jpg";
+import img15 from "../../assets/img15.jpg";
+import img16 from "../../assets/img16.jpg";
+import img17 from "../../assets/img17.jpg";
+import img18 from "../../assets/img18.jpg";
+import img19 from "../../assets/img19.jpg";
+import img20 from "../../assets/img20.jpg";
+
+import img21 from "../../assets/img21.jpg";
+import img22 from "../../assets/img22.jpg";
+import img23 from "../../assets/img23.jpg";
+import img24 from "../../assets/img24.jpg";
+import img25 from "../../assets/img25.jpg";
+import img26 from "../../assets/img26.jpg";
+import img27 from "../../assets/img27.jpg";
+import img28 from "../../assets/img28.jpg";
+import img29 from "../../assets/img29.jpg";
+import img30 from "../../assets/img30.jpg";
 
 type ConfettiShard = {
     id: number;
@@ -14,6 +46,158 @@ type ConfettiShard = {
 };
 
 type CSSVarStyle = React.CSSProperties & { ["--i"]?: number | string };
+
+// --- Swipeable Overlapping Image Deck (vanilla, no libs) ---
+
+type DeckImage = { src: string; text?: string };
+
+type SwipeDeckProps = {
+    images: DeckImage[];
+    visible?: number;
+    onDepleted?: () => void;
+};
+
+function SwipeDeck({ images, visible = 3, onDepleted }: SwipeDeckProps) {
+    const [idx, setIdx] = useState(0);
+
+    const slice = useMemo(() => {
+        return images.slice(idx, Math.min(images.length, idx + visible));
+    }, [idx, images, visible]);
+
+    const hasCards = idx < images.length;
+
+    const handleDismissTop = () => {
+        const next = idx + 1;
+        setIdx(next);
+        if (next >= images.length) onDepleted?.();
+    };
+
+    return (
+        <div className="swipe-deck">
+            {/* Back layers (furthest first) */}
+            {slice.slice(1).map((item, i) => {
+                const depth = slice.length - (i + 1); // 1, 2, ...
+                return (
+                    <BackLayer
+                        key={`back-${idx + i + 1}-${item.src}`}
+                        item={item}
+                        depth={depth}
+                    />
+                );
+            })}
+
+            {/* Top interactive card */}
+            {hasCards && slice.length > 0 ? (
+                <TopSwipeCard
+                    key={`top-${idx}-${slice[0].src}`}
+                    item={slice[0]}
+                    onDismiss={handleDismissTop}
+                />
+            ) : (
+                <div className="swipe-empty">
+                    <p>
+                        หมดรูปแล้วน้า ✨ สุดท้ายนี้ไม่รู้ผลลัพธ์ของความสัมพันธ์ ของเราจะออกมาเป็นอย่างไร
+                        แต่เค้าขอบคุณเธอมากนะคะกับเรื่องราวที่ผ่านมา และเค้าก็อยากจะมอบเรื่องราวดีๆให้กับเธอเหมือนกันนะคะ
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function BackLayer({ item, depth }: { item: DeckImage; depth: number }) {
+    const translateY = 14 * depth;
+    const scale = 1 - depth * 0.035;
+
+    return (
+        <div
+            className="swipe-card swipe-back"
+            style={{
+                transform: `translate(-50%, -50%) translateY(${translateY}px) scale(${scale})`,
+                zIndex: 50 - depth,
+            }}
+        >
+            <img src={item.src} alt="" draggable={false} />
+            {item.text && <div className="swipe-caption">{item.text}</div>}
+        </div>
+    );
+}
+
+function TopSwipeCard({
+    item,
+    onDismiss,
+}: {
+    item: DeckImage;
+    onDismiss: () => void;
+}) {
+    const [dragX, setDragX] = useState(0);
+    const [grabbing, setGrabbing] = useState(false);
+    const [dismiss, setDismiss] = useState<null | "left" | "right">(null);
+    const startXRef = useRef(0);
+
+    const THRESHOLD = 120;
+
+    const onPointerDown = (e: React.PointerEvent) => {
+        (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+        setGrabbing(true);
+        startXRef.current = e.clientX;
+    };
+
+    const onPointerMove = (e: React.PointerEvent) => {
+        if (!grabbing) return;
+        setDragX(e.clientX - startXRef.current);
+    };
+
+    const onPointerUp = () => {
+        if (!grabbing) return;
+        setGrabbing(false);
+
+        if (Math.abs(dragX) > THRESHOLD) {
+            const dir = dragX > 0 ? "right" : "left";
+            setDismiss(dir);
+            setTimeout(() => {
+                setDismiss(null);
+                setDragX(0);
+                onDismiss();
+            }, 260);
+        } else {
+            setDragX(0);
+        }
+    };
+
+    const rotation = dragX / 12;
+    const base = `translate(-50%, -50%)`;
+    const draggingTransform = `${base} translateX(${dragX}px) rotate(${rotation}deg)`;
+    const offscreen =
+        dismiss === "right"
+            ? `translateX(calc(50vw + 60%)) rotate(18deg)`
+            : `translateX(calc(-50vw - 60%)) rotate(-18deg)`;
+    const finalTransform = dismiss ? `${base} ${offscreen}` : draggingTransform;
+
+    return (
+        <div
+            className={`swipe-card ${grabbing ? "grabbing" : ""} ${dismiss ? "dismiss" : ""}`}
+            style={{
+                transform: finalTransform,
+                transition: grabbing
+                    ? "none"
+                    : "transform 240ms cubic-bezier(.22,.61,.36,1), opacity 240ms",
+                opacity: dismiss ? 0 : 1,
+                zIndex: 100,
+                touchAction: "none",
+                cursor: grabbing ? "grabbing" : "grab",
+            }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+        >
+            <img src={item.src} alt="" draggable={false} />
+            <div className="swipe-gradient" />
+            {item.text && <div className="swipe-caption">{item.text}</div>}
+        </div>
+    );
+}
 
 export default function Gallery() {
     const scrollerRef = useRef<HTMLDivElement | null>(null);
@@ -210,6 +394,50 @@ export default function Gallery() {
             {/* Choices */}
             {showChoices && (
                 <div className="choices-container">
+                    {/* NEW: overlapping swipe deck */}
+                    <div className="swipe-wrap">
+                        <SwipeDeck
+                            images={[
+                                { src: img01, text: "เธอยิ้มละน่ารักสุดๆ 😆💗" },
+                                { src: img02, text: "เธอดูแลเค้าดีมากๆ 🥺💕" },
+                                { src: img03, text: "ตอนนี้เค้ารักเธอจริงๆนะคะ 🎬" },
+                                { src: img04, text: "คิดถึงอ้วนมากๆ 🤗🤏" },
+                                { src: img05, text: "รูปนี้น่ารัก555 🤗💞" },
+                                { src: img06, text: "ไอตัวเล็ก ยิ้มได้ยัง 🌈✨" },
+                                { src: img07, text: "หิวอยากกินข้าวด้วยคับ 😳💘" },
+                                { src: img08, text: "eatๆๆๆ 🌈🤭💞" },
+                                { src: img09, text: "เค้าอยากให้เธอโชคดีบ้างที่มีเค้า 🍀💗" },
+                                { src: img10, text: "ตอนนี้เริ่มคถ. หน้าวีนๆของเธอละ 🙆‍♂️💞" },
+
+                                { src: img11, text: "ยิ้มแบบนี้ก็ด้ายยย 🤭🫠❤️" },
+                                { src: img12, text: "ทามะจะกัดเค้ามั้ยย 🥹🥹🥹" },
+                                { src: img13, text: "คถ.โบ้ด้วย  🙆‍♂️💐💗" },
+                                { src: img14, text: "ไออ้วนนนนนนน 🫶" },
+                                { src: img15, text: " ❤️💭💘✨" },
+                                { src: img16, text: "รักเธอนะคะ… 🥹💕" },
+                                { src: img17, text: "ฮิๆๆๆ 🌎🌅🏡💗" },
+                                { src: img18, text: "ไปเที่ยวกันอีกนะ 🌙✨" },
+                                { src: img19, text: "ทำหน้าดุได้แม่ 🤭💞" },
+                                { src: img20, text: "ฮาโหลๆๆ ค้าบบบ 💗" },
+
+                                { src: img21, text: "กิบุฟเฟต์จนหน้าบวม 5555 🤭" },
+                                { src: img22, text: "ฮาาโย๋ อยากคุยกับเธอแล้วน้าา🤍" },
+                                { src: img23, text: "ยิ้มได้ยัง 😭💗✨" },
+                                { src: img24, text: "แบบนี้ 😁😁😁😁😁" },
+                                { src: img25, text: "คิดถึงจิงๆน้าาาา 🥺💕" },
+                                { src: img26, text: "เขียนไรดีน้าาา 👀🙆‍♂️💞" },
+                                { src: img27, text: "แบร่ๆๆๆๆ เจ้าหน้าบึ่งตึง 👀" },
+                                { src: img28, text: "เค้าใส่มากี่ภาพนะ อยากใส่สัก 100 ภาพ 🕊️❤️" },
+                                { src: img29, text: "คืนดีได้ยังคะเนี่ย แงงงงงงงง 😭😭😭" },
+                                { src: img30, text: "สุดท้ายแล้ววน้าา เกี่ยวก้อยคืนดีกันนเถอะ แล้วสไลด์รูปสุดท้ายออกด้วยนะคะ✌️✌️✌️" },
+                            ]}
+                            visible={3}
+                            onDepleted={() => {
+                                if (navigator.vibrate) navigator.vibrate([20, 20, 20]);
+                            }}
+                        />
+                    </div>
+
                     <div className="choices-prompt">คืนดีกันน้าาาาาา 💗</div>
                     <div className="choices glass" role="group" aria-label="Answer choices">
                         <button
