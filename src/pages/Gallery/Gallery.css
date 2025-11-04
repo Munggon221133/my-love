@@ -6,7 +6,6 @@
     overflow: hidden;
 }
 
-/* Minimal progress */
 .progress {
     position: sticky;
     top: 0;
@@ -25,7 +24,6 @@
     transition: width .15s linear;
 }
 
-/* Scroll area (manual only) */
 .credits-scroller {
     position: relative;
     z-index: 1;
@@ -35,7 +33,6 @@
     padding: 24px 16px 120px;
 }
 
-/* Content */
 .credits {
     max-width: 720px;
     margin: 0 auto;
@@ -50,7 +47,6 @@
     color: #583101;
 }
 
-/* Choices */
 .choices-container {
     position: sticky;
     bottom: 0;
@@ -88,7 +84,6 @@
     background: transparent;
 }
 
-/* Filled accent for YES, outline for NO */
 .choice-btn.yes {
     background: #c68e87;
     border-color: transparent;
@@ -118,18 +113,15 @@
     transform: translateY(1px) scale(0.99);
 }
 
-/* Smooth gap adjustments */
 .choices {
     transition: gap .25s ease;
 }
 
-/* Slight fade when very small */
 .choice-btn.no[style*="scale(0.35)"] {
     opacity: 0.65;
     filter: blur(0.3px);
 }
 
-/* Confetti — minimal, accent only */
 .confetti-layer {
     pointer-events: none;
     position: fixed;
@@ -195,6 +187,74 @@
         opacity: 0;
         transform: translate(calc(-50% + var(--dx)), 52vh) rotate(calc(var(--r) + 360deg)) scale(calc(var(--s) * 0.85));
     }
+}
+
+.cards {
+    max-width: 760px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-top: 4vh;
+}
+
+.note-card {
+    --rot: calc((var(--i) % 2 - 0.5) * 2deg);
+    position: relative;
+    background: #fff4ea;
+    color: #583101;
+    border: 1px solid rgba(0, 0, 0, .06);
+    border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, .08),
+        0 1px 0 rgba(255, 255, 255, .4) inset;
+    transform: rotate(var(--rot)) translateY(6px);
+    opacity: 0;
+    translate: 0 16px;
+    transition: opacity .5s ease, translate .5s ease, transform .25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.note-card.visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.note-card:active,
+.note-card:hover {
+    transform: rotate(var(--rot)) translateY(0);
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, .12),
+        0 1px 0 rgba(255, 255, 255, .5) inset;
+}
+
+.note-pin {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #c68e87;
+    color: #fff;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.note-text {
+    margin: 0;
+    font-size: clamp(15px, 4vw, 19px);
+    line-height: 1.7;
+}
+
+.choices-container {
+    background: linear-gradient(180deg, rgba(221, 184, 146, 0), rgba(221, 184, 146, 0.65) 35%, rgba(221, 184, 146, 0.9));
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
 }
 
 /* Reduced motion */
