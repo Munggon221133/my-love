@@ -33,6 +33,8 @@ import img28 from "../../assets/img28.jpg";
 import img29 from "../../assets/img29.jpg";
 import img30 from "../../assets/img30.jpg";
 
+import videoMp4 from "../../assets/video.mp4";
+
 type ConfettiShard = {
     id: number;
     x: number;
@@ -55,14 +57,27 @@ type SwipeDeckProps = {
     images: DeckImage[];
     visible?: number;
     onDepleted?: () => void;
+    /** NEW: show this video when all images are swiped out */
+    videoSrc?: string;
+    /** Optional: start muted (recommended for mobile autoplay) */
+    startMuted?: boolean;
 };
 
-function SwipeDeck({ images, visible = 3, onDepleted }: SwipeDeckProps) {
+function SwipeDeck({
+    images,
+    visible = 3,
+    onDepleted,
+    videoSrc,
+    startMuted = true,
+}: SwipeDeckProps) {
     const [idx, setIdx] = useState(0);
+    const [soundEnabled, setSoundEnabled] = useState(!startMuted);
+    const videoRef = useRef<HTMLVideoElement | null>(null);
 
-    const slice = useMemo(() => {
-        return images.slice(idx, Math.min(images.length, idx + visible));
-    }, [idx, images, visible]);
+    const slice = useMemo(
+        () => images.slice(idx, Math.min(images.length, idx + visible)),
+        [idx, images, visible]
+    );
 
     const hasCards = idx < images.length;
 
@@ -72,33 +87,62 @@ function SwipeDeck({ images, visible = 3, onDepleted }: SwipeDeckProps) {
         if (next >= images.length) onDepleted?.();
     };
 
+    const enableSound = () => {
+        if (!videoRef.current) return;
+        videoRef.current.muted = false;
+        videoRef.current.play();
+        setSoundEnabled(true);
+    };
+
     return (
         <div className="swipe-deck">
-            {/* Back layers (furthest first) */}
-            {slice.slice(1).map((item, i) => {
-                const depth = slice.length - (i + 1); // 1, 2, ...
-                return (
-                    <BackLayer
-                        key={`back-${idx + i + 1}-${item.src}`}
-                        item={item}
-                        depth={depth}
-                    />
-                );
-            })}
-
-            {/* Top interactive card */}
             {hasCards && slice.length > 0 ? (
-                <TopSwipeCard
-                    key={`top-${idx}-${slice[0].src}`}
-                    item={slice[0]}
-                    onDismiss={handleDismissTop}
-                />
+                <>
+                    {/* Back layers */}
+                    {slice.slice(1).map((item, i) => {
+                        const depth = slice.length - (i + 1);
+                        return (
+                            <BackLayer
+                                key={`back-${idx + i + 1}-${item.src}`}
+                                item={item}
+                                depth={depth}
+                            />
+                        );
+                    })}
+
+                    {/* Top interactive card */}
+                    <TopSwipeCard
+                        key={`top-${idx}-${slice[0].src}`}
+                        item={slice[0]}
+                        onDismiss={handleDismissTop}
+                    />
+                </>
             ) : (
                 <div className="swipe-empty">
                     <p>
                         หมดรูปแล้วน้า ✨ สุดท้ายนี้ไม่รู้ผลลัพธ์ของความสัมพันธ์ ของเราจะออกมาเป็นอย่างไร
                         แต่เค้าขอบคุณเธอมากนะคะกับเรื่องราวที่ผ่านมา และเค้าก็อยากจะมอบเรื่องราวดีๆให้กับเธอเหมือนกันนะคะ
                     </p>
+
+                    {/* Show video when deck is empty */}
+                    {videoSrc && (
+                        <>
+                            <video
+                                ref={videoRef}
+                                src={videoSrc}
+                                autoPlay
+                                muted={!soundEnabled}
+                                loop
+                                playsInline
+                                className="ending-video"
+                            />
+                            {!soundEnabled && (
+                                <button className="sound-btn" onClick={enableSound}>
+                                    เปิดเสียง 💗
+                                </button>
+                            )}
+                        </>
+                    )}
                 </div>
             )}
         </div>
@@ -429,9 +473,11 @@ export default function Gallery() {
                                 { src: img27, text: "แบร่ๆๆๆๆ เจ้าหน้าบึ่งตึง 👀" },
                                 { src: img28, text: "เค้าใส่มากี่ภาพนะ อยากใส่สัก 100 ภาพ 🕊️❤️" },
                                 { src: img29, text: "คืนดีได้ยังคะเนี่ย แงงงงงงงง 😭😭😭" },
-                                { src: img30, text: "สุดท้ายแล้ววน้าา เกี่ยวก้อยคืนดีกันนเถอะ แล้วสไลด์รูปสุดท้ายออกด้วยนะคะ✌️✌️✌️" },
+                                { src: img30, text: "สุดท้ายแล้ววน้าาเกี่ยวก้อยคืนดีกันนเถอะ สไลด์รูปสุดท้ายออกด้วยนะคะ✌️✌️✌️" },
                             ]}
                             visible={3}
+                            videoSrc={videoMp4}
+                            startMuted={true}
                             onDepleted={() => {
                                 if (navigator.vibrate) navigator.vibrate([20, 20, 20]);
                             }}

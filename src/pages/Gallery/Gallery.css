@@ -48,15 +48,34 @@
 }
 
 .swipe-empty {
-    text-align: center;
-    font-size: 16px;
-    padding: 12px;
-    color: #5b392d;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
+  text-align: center;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
 }
+
+.ending-video {
+  width: 100%;
+  max-width: 350px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.sound-btn {
+  margin-top: 8px;
+  padding: 10px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  background: #c68e87;
+  color: #fff;
+  cursor: pointer;
+}
+
+.sound-btn:hover { background: #a8726b; }
 
 .choices-container {
     position: sticky;
@@ -69,7 +88,7 @@
     text-align: center;
     color: #583101;
     font-size: clamp(14px, 3vw, 16px);
-    margin: 8px 0 6px;
+    margin: 200px 0 6px;
 }
 
 .choices {
@@ -340,7 +359,7 @@
 
 /* Optional: make the deck sit nicely with your glass UI */
 .choices-container .swipe-wrap+.choices-prompt {
-    margin-top: 6px;
+    margin-top: 200px;
 }
 
 /* Reduced motion */
