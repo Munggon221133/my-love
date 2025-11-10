@@ -88,7 +88,7 @@
     text-align: center;
     color: #583101;
     font-size: clamp(14px, 3vw, 16px);
-    margin: 250px 0 6px;
+    margin: 260px 0 6px;
 }
 
 .choices {
@@ -359,7 +359,7 @@
 
 /* Optional: make the deck sit nicely with your glass UI */
 .choices-container .swipe-wrap+.choices-prompt {
-    margin-top: 300px;
+    margin-top: 320px;
 }
 
 /* Reduced motion */
